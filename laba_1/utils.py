@@ -65,19 +65,6 @@ def resampling_one(img, k):
     return new_image
 
 
-def semitone_rgb(img):
-    width = img.size[0]
-    height = img.size[1]
-    new_image = Image.new('RGB', (width, height))
-
-    for x in range(width):
-        for y in range(height):
-            pix = img.getpixel((x, y))
-            sum_ = sum(pix) // 3
-            new_image.putpixel((x, y), (sum_, sum_, sum_))
-    return new_image
-
-
 def semitone(img):
     width = img.size[0]
     height = img.size[1]
@@ -93,16 +80,17 @@ def semitone(img):
 
 def mono(img):
     img = semitone(img)
-    img.show()
-    int_img = integral(img)
-    int_img.show()
+    l = integral(img)
     width = img.size[0]
     height = img.size[1]
+
     new_image = Image.new('1', (width, height))
     for x in range(width):
         for y in range(height):
+
             pix = img.getpixel((x, y))
-            int_pix = mid_s(img, x, y, width, height)
+            int_pix = mid_pix(l, x, y, width, height)
+            print(pix, int_pix)
             if pix < int_pix:
                 new_image.putpixel((x, y), 0)
             else:
@@ -115,120 +103,60 @@ def integral(img):
 
     width = img.size[0]
     height = img.size[1]
-    int_img = Image.new('L', (width, height))
-
-    l = [[0 for _ in range(height)] for _ in range(width)]
+    l = [[0 for _ in range(width)] for _ in range(height)]
 
     for x in range(width):
         for y in range(height):
             pix = img.getpixel((x, y))
             if x == 0 and y == 0:
                 new_pix = pix
-
             elif x == 0 and y > 0:
-                new_pix = pix + l[x][y - 1]
-
+                new_pix = pix + l[y - 1][x]
             elif x > 0 and y == 0:
-                new_pix = pix + l[x-1][y]
+                new_pix = pix + l[y][x - 1]
             else:
-                new_pix = pix - l[x-1][y-1] + l[x][y - 1] + l[x-1][y]
-
-            int_img.putpixel((x, y), new_pix)
-            l[x][y] = new_pix
-
-    return int_img
+                new_pix = pix - l[y-1][x-1] + l[y - 1][x] + l[y][x-1]
+            l[y][x] = new_pix
+    return l
 
 
-def mid_s(img, x, y, width, heigjt):
-    s = 4
-    if x + s >= width and y + s >= heigjt :
-        p = img.getpixel((x, y)) - img.getpixel((x - s, y)) \
-            - img.getpixel((x, y - s)) + img.getpixel((x - s, y - s))
-    elif y + s >= heigjt:
-        p = img.getpixel((x + s, y)) - img.getpixel((x - s, y)) \
-            - img.getpixel((x, y - s)) + img.getpixel((x - s, y - s))
-    elif x + s >= width:
-        p = img.getpixel((x, y + s)) - img.getpixel((x - s, y)) \
-            - img.getpixel((x, y - s)) + img.getpixel((x - s, y - s))
-    elif x > s and y > s:
-        p = img.getpixel((x + s, y + s)) - img.getpixel((x - s, y))\
-            - img.getpixel((x, y - s)) + img.getpixel((x - s, y - s))
-    elif y < s < x:
+def mid_pix(l, x, y, width, height, s=40):
 
-        p = img.getpixel((x + s, y + s)) - img.getpixel((x - s, y))
-    elif x < s < y:
-        p = img.getpixel((x + s, y + s)) - img.getpixel((x, y - s))
-    else:
-        p = img.getpixel((x + s, y + s))
-    return p *s
-#
-# def integral_(img):
-#
-#     width = img.size[0]
-#     height = img.size[1]
-#     int_img = Image.new('RGB', (width, height))
-#     sum__x = 0
-#     for x in range(width):
-#         sum__x += img.getpixel((x, 0))[0]
-#         sum_ = 0
-#         for y in range(height):
-#             pix = img.getpixel((x, y))[0]
-#             sum_ += pix
-#             int_img.putpixel((x, y), (sum_, sum_, sum_))
-#     int_img.show()
-#     return int_img
+    # if x > s and y > s and y + s < height and x + s < width:
+    #     return (l[y + s][x + s] - l[y - s][x + s] - l[y + s][x - s] + l[y - s][x - s]) // ((s * 2 + 1)**2)
+    if y + s >= height or x + s >= width:
+        x_ = width - x
+        y_ = height - y
+        if y + s >= height and x + s >= width:
+            x = width - 1
+            y = height - 1
+            p = l[y][x] - l[y - s][x] - l[y][x - s] + l[y - s][x - s]
+            sqrt = (s + 1) ** 2
 
+        elif y + s >= height:
+            y = height - 1
+            p = l[y][x] - l[y - s][x + s] - l[y][x - s] + l[y - s][x - s]
+            sqrt = (y_ + 1) * (s * 2 + 1)
 
-# def integral__(img):
-#
-#     width = img.size[0]
-#     height = img.size[1]
-#     int_img = Image.new('RGB', (width, height))
-#
-#     def l(x, y):
-#         if x < 0 or y < 0:
-#             return 0
-#         pix = img.getpixel((x, y))[0]
-#         new_pix = pix - l(x-1, y-1) + l(x, y - 1) + l(x-1, y)
-#         int_img.putpixel((x, y), new_pix)
-#         return new_pix
-#
-#     l(width - 1, height - 1)
-#     int_img.show()
-#     return int_img
+        elif x + s >= width:
+            x = width - 1
+            p = l[y][x] - l[y - s][x] - l[y + s][x - s] + l[y - s][x - s]
+            sqrt = (x_ + 1) * (s * 2 + 1)
 
-#
-# def mono(img, s=4):
-#     img = semitone(img)
-#     width = img.size[0]
-#     height = img.size[1]
-#     new_image = Image.new('RGB', (width, height))
-#
-#     int_ing = integral(img)
-#
-#     def get_s(x, y, s):
-#         p = 0
-#         if  0 < x < s and 0< y < s:
-#             p = int_ing.getpixel((x + s, y + s))[0]
-#             return p
-#         elif 0 < x < s and y > s:
-#             p = int_ing.getpixel((x + s, y + s))[0] - int_ing.getpixel((x, y - s))[0]
-#             return p * 2 // s
-#         elif x > s and 0 < y < s:
-#             p = int_ing.getpixel((x + s, y + s))[0] - int_ing.getpixel((x - s, y))[0]
-#             return p * 2 // s
-#         elif x > s and y> s:
-#             p = int_ing.getpixel((x + s, y + s))[0] - int_ing.getpixel((x- s, y))[0] - int_ing.getpixel((x, y- s))[0] + int_ing.getpixel((x - s, y - s))[0]
-#         return p // (s*s)
-#     # for x in range(width):
-#     #     for y in range(height):
-#     #         pix = img.getpixel((x, y))[0]
-#     #
-#     #         int_pix = get_s(x - 1, y - 1, s)
-#     #         print(pix, int_pix)
-#     #         if pix < int_pix:
-#     #             new_image.putpixel((x, y), (0, 0, 0))
-#     #         else:
-#     #             new_image.putpixel((x, y), (255, 255, 255))
-#
-#     return new_image
+        return p // sqrt
+
+    p = l[y + s][x + s]
+    if x > s and y > s:
+        p = p - l[y - s][x + s] - l[y + s][x - s] + l[y - s][x - s]
+        sqrt = (s * 2 + 1)**2
+    elif y <= s <= x:
+        p -= l[y + s][x - s]
+        sqrt = (y + 1) * (s * 2 + 1)
+    elif x <= s <= y:
+        p -= l[y - s][x + s]
+        sqrt = (x + 1) * (s * 2 + 1)
+    elif x < s and y < s:
+        p = l[y][x]
+        sqrt = (x + 1) * (y + 1)
+    print(x, y)
+    return p // sqrt

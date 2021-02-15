@@ -23,6 +23,6 @@ def main(img):
     img_gray = mono(img)
     img_gray.show()
 
-img = Image.open('cat.jpg')
+img = Image.open('images/eye.jpg')
 
 main(img)
