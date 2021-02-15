@@ -51,6 +51,10 @@ def resampling(img, m, n):
 
 
 def resampling_one(img, k):
+    """ k = m/n
+    m: increase
+    n: decrease
+    """
 
     width = img.size[0]
     height = img.size[1]
@@ -80,6 +84,7 @@ def semitone(img):
 
 def mono(img):
     img = semitone(img)
+    img.show()
     l = integral(img)
     width = img.size[0]
     height = img.size[1]
@@ -120,24 +125,29 @@ def integral(img):
     return l
 
 
-def mid_pix(l, x, y, width, height, s=20):
+def mid_pix(l, x, y, width, height, s=25):
 
-    # if x > s and y > s and y + s < height and x + s < width:
-    #     return (l[y + s][x + s] - l[y - s][x + s] - l[y + s][x - s] + l[y - s][x - s]) // ((s * 2 + 1)**2)
     if y + s >= height or x + s >= width:
         if y + s >= height and x + s >= width:
             x = width - 1
             y = height - 1
             p = l[y][x] - l[y - s][x] - l[y][x - s] + l[y - s][x - s]
-            sqrt = (x - (x - s)) * (y - (y - s))
+            sqrt = (x + 1 - (x - s)) * (y + 1 - (y - s))
+
+        elif y <= s <= x and x + s >= width:
+            p = l[y + s][width - 1] - l[y + s][x - s]
+            sqrt = (width - 1 - (x - s)) * (y + s + 1)
+        elif x <= s <= y and y + s >= height:
+            p = l[height - 1][x + s] - l[y - s][x + s]
+            sqrt = (x + s + 1) * (height - 1 - (y - s) + 1)
 
         elif y + s >= height:
             p = l[height - 1][x + s] - l[y - s][x + s] - l[height - 1][x - s] + l[y - s][x - s]
-            sqrt = (x + s - (x - s)) * (height - 1 - (y - s))
+            sqrt = (x + s - (x - s)) * (height - 1 - (y - s) + 1)
 
         elif x + s >= width:
             p = l[y + s][width - 1] - l[y - s][width - 1] - l[y + s][x - s] + l[y - s][x - s]
-            sqrt = (width - 1 - (x - s)) * (y + s - (y - s))
+            sqrt = (width - (x - s)) * (y + s - (y - s) + 1)
         return p // sqrt
 
     p = l[y + s][x + s]
@@ -147,10 +157,10 @@ def mid_pix(l, x, y, width, height, s=20):
 
     elif y <= s <= x:
         p -= l[y + s][x - s]
-        sqrt = (s * 2 + 1 - (s - y)) * (x + s - (x - s) + 1)
+        sqrt = (x + s - (x - s) + 1) * (y + s + 1)
     elif x <= s <= y:
         p -= l[y - s][x + s]
-        sqrt = (s * 2 + 1 - (s - x)) * (y + s - (y - s) + 1)
+        sqrt = (x + s + 1) * (y + s - (y - s) + 1)
 
     elif x < s and y < s:
         p = l[y][x]
