@@ -120,43 +120,39 @@ def integral(img):
     return l
 
 
-def mid_pix(l, x, y, width, height, s=40):
+def mid_pix(l, x, y, width, height, s=20):
 
     # if x > s and y > s and y + s < height and x + s < width:
     #     return (l[y + s][x + s] - l[y - s][x + s] - l[y + s][x - s] + l[y - s][x - s]) // ((s * 2 + 1)**2)
     if y + s >= height or x + s >= width:
-        x_ = width - x
-        y_ = height - y
         if y + s >= height and x + s >= width:
             x = width - 1
             y = height - 1
             p = l[y][x] - l[y - s][x] - l[y][x - s] + l[y - s][x - s]
-            sqrt = (s + 1) ** 2
+            sqrt = (x - (x - s)) * (y - (y - s))
 
         elif y + s >= height:
-            y = height - 1
-            p = l[y][x] - l[y - s][x + s] - l[y][x - s] + l[y - s][x - s]
-            sqrt = (y_ + 1) * (s * 2 + 1)
+            p = l[height - 1][x + s] - l[y - s][x + s] - l[height - 1][x - s] + l[y - s][x - s]
+            sqrt = (x + s - (x - s)) * (height - 1 - (y - s))
 
         elif x + s >= width:
-            x = width - 1
-            p = l[y][x] - l[y - s][x] - l[y + s][x - s] + l[y - s][x - s]
-            sqrt = (x_ + 1) * (s * 2 + 1)
-
+            p = l[y + s][width - 1] - l[y - s][width - 1] - l[y + s][x - s] + l[y - s][x - s]
+            sqrt = (width - 1 - (x - s)) * (y + s - (y - s))
         return p // sqrt
 
     p = l[y + s][x + s]
     if x > s and y > s:
         p = p - l[y - s][x + s] - l[y + s][x - s] + l[y - s][x - s]
         sqrt = (s * 2 + 1)**2
+
     elif y <= s <= x:
         p -= l[y + s][x - s]
-        sqrt = (y + 1) * (s * 2 + 1)
+        sqrt = (s * 2 + 1 - (s - y)) * (x + s - (x - s) + 1)
     elif x <= s <= y:
         p -= l[y - s][x + s]
-        sqrt = (x + 1) * (s * 2 + 1)
+        sqrt = (s * 2 + 1 - (s - x)) * (y + s - (y - s) + 1)
+
     elif x < s and y < s:
         p = l[y][x]
         sqrt = (x + 1) * (y + 1)
-    print(x, y)
     return p // sqrt
