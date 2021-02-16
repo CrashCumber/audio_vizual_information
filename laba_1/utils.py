@@ -1,8 +1,11 @@
 import numpy as np
 from PIL import Image, ImageDraw
 
+from laba_1 import INDENT
+
 
 def upsampling(img, m):
+    """Increasing the image by m."""
 
     width = img.size[0]
     height = img.size[1]
@@ -18,6 +21,7 @@ def upsampling(img, m):
 
 
 def downsampling(img, n):
+    """Reducing the image by n."""
 
     width = img.size[0]
     height = img.size[1]
@@ -32,29 +36,8 @@ def downsampling(img, n):
     return new_image
 
 
-def resampling(img, m, n):
-    """
-    m: increase
-    n: decrease
-    """
-    width = img.size[0]
-    height = img.size[1]
-    new_w = int(width * m / n - 1)
-    new_h = int(height * m / n - 1)
-
-    new_image = Image.new('RGB', (new_w, new_h))
-    for x in range(new_w):
-        for y in range(new_h):
-            pix = img.getpixel((x * n / m, y * n / m))
-            new_image.putpixel((x, y), pix)
-    return new_image
-
-
-def resampling_one(img, k):
-    """ k = m/n
-    m: increase
-    n: decrease
-    """
+def resampling(img, k):
+    """Сhanging the image scale in k = m / n"""
 
     width = img.size[0]
     height = img.size[1]
@@ -70,6 +53,8 @@ def resampling_one(img, k):
 
 
 def semitone(img):
+    """Reducing the image to a semitone"""
+
     width = img.size[0]
     height = img.size[1]
     new_image = Image.new('L', (width, height))
@@ -77,25 +62,24 @@ def semitone(img):
     for x in range(width):
         for y in range(height):
             pix = img.getpixel((x, y))
-            sum_ = sum(pix) // 3
-            new_image.putpixel((x, y), sum_)
+            sum_ = 0.3 * pix[0] + 0.59 * pix[1] + 0.11 * pix[2]
+            # sum_ = sum(pix) // 3
+            new_image.putpixel((x, y), int(sum_))
     return new_image
 
 
 def mono(img):
+    """Converting the image to black and white."""
     img = semitone(img)
-    img.show()
-    l = integral(img)
+    integral_img = integral(img)
     width = img.size[0]
     height = img.size[1]
-
     new_image = Image.new('1', (width, height))
+
     for x in range(width):
         for y in range(height):
-
             pix = img.getpixel((x, y))
-            int_pix = mid_pix(l, x, y, width, height)
-            print(pix, int_pix)
+            int_pix = mid_pix(integral_img, x, y, width, height)
             if pix < int_pix:
                 new_image.putpixel((x, y), 0)
             else:
@@ -105,10 +89,11 @@ def mono(img):
 
 
 def integral(img):
+    """Calculating the integral image."""
 
     width = img.size[0]
     height = img.size[1]
-    l = [[0 for _ in range(width)] for _ in range(height)]
+    integral_img = [[0 for _ in range(width)] for _ in range(height)]
 
     for x in range(width):
         for y in range(height):
@@ -116,53 +101,57 @@ def integral(img):
             if x == 0 and y == 0:
                 new_pix = pix
             elif x == 0 and y > 0:
-                new_pix = pix + l[y - 1][x]
+                new_pix = pix + integral_img[y - 1][x]
             elif x > 0 and y == 0:
-                new_pix = pix + l[y][x - 1]
+                new_pix = pix + integral_img[y][x - 1]
             else:
-                new_pix = pix - l[y-1][x-1] + l[y - 1][x] + l[y][x-1]
-            l[y][x] = new_pix
-    return l
+                new_pix = pix - integral_img[y-1][x-1] + integral_img[y - 1][x] + integral_img[y][x-1]
+            integral_img[y][x] = new_pix
+    return integral_img
 
 
-def mid_pix(l, x, y, width, height, s=25):
+def mid_pix(integral_img, x, y, width, height, indent=INDENT):
+    """Average value of a pixel on an area with an indent s."""
 
-    if y + s >= height or x + s >= width:
-        if y + s >= height and x + s >= width:
+    sqrt = 0
+    pix = 0
+
+    if y + indent >= height or x + indent >= width:
+        if y + indent >= height and x + indent >= width:
             x = width - 1
             y = height - 1
-            p = l[y][x] - l[y - s][x] - l[y][x - s] + l[y - s][x - s]
-            sqrt = (x + 1 - (x - s)) * (y + 1 - (y - s))
+            pix = integral_img[y][x] - integral_img[y - indent][x] - integral_img[y][x - indent] + integral_img[y - indent][x - indent]
+            sqrt = (x + 1 - (x - indent)) * (y + 1 - (y - indent))
 
-        elif y <= s <= x and x + s >= width:
-            p = l[y + s][width - 1] - l[y + s][x - s]
-            sqrt = (width - 1 - (x - s)) * (y + s + 1)
-        elif x <= s <= y and y + s >= height:
-            p = l[height - 1][x + s] - l[y - s][x + s]
-            sqrt = (x + s + 1) * (height - 1 - (y - s) + 1)
+        elif y <= indent <= x and x + indent >= width:
+            pix = integral_img[y + indent][width - 1] - integral_img[y + indent][x - indent]
+            sqrt = (width - 1 - (x - indent)) * (y + indent + 1)
+        elif x <= indent <= y and y + indent >= height:
+            pix = integral_img[height - 1][x + indent] - integral_img[y - indent][x + indent]
+            sqrt = (x + indent + 1) * (height - 1 - (y - indent) + 1)
 
-        elif y + s >= height:
-            p = l[height - 1][x + s] - l[y - s][x + s] - l[height - 1][x - s] + l[y - s][x - s]
-            sqrt = (x + s - (x - s)) * (height - 1 - (y - s) + 1)
+        elif y + indent >= height:
+            pix = integral_img[height - 1][x + indent] - integral_img[y - indent][x + indent] - integral_img[height - 1][x - indent] + integral_img[y - indent][x - indent]
+            sqrt = (x + indent - (x - indent)) * (height - 1 - (y - indent) + 1)
 
-        elif x + s >= width:
-            p = l[y + s][width - 1] - l[y - s][width - 1] - l[y + s][x - s] + l[y - s][x - s]
-            sqrt = (width - (x - s)) * (y + s - (y - s) + 1)
-        return p // sqrt
+        elif x + indent >= width:
+            pix = integral_img[y + indent][width - 1] - integral_img[y - indent][width - 1] - integral_img[y + indent][x - indent] + integral_img[y - indent][x - indent]
+            sqrt = (width - (x - indent)) * (y + indent - (y - indent) + 1)
+        return pix // sqrt
 
-    p = l[y + s][x + s]
-    if x > s and y > s:
-        p = p - l[y - s][x + s] - l[y + s][x - s] + l[y - s][x - s]
-        sqrt = (s * 2 + 1)**2
+    pix = integral_img[y + indent][x + indent]
+    if x > indent and y > indent:
+        pix = pix - integral_img[y - indent][x + indent] - integral_img[y + indent][x - indent] + integral_img[y - indent][x - indent]
+        sqrt = (indent * 2 + 1) ** 2
 
-    elif y <= s <= x:
-        p -= l[y + s][x - s]
-        sqrt = (x + s - (x - s) + 1) * (y + s + 1)
-    elif x <= s <= y:
-        p -= l[y - s][x + s]
-        sqrt = (x + s + 1) * (y + s - (y - s) + 1)
+    elif y <= indent <= x:
+        pix -= integral_img[y + indent][x - indent]
+        sqrt = (x + indent - (x - indent) + 1) * (y + indent + 1)
+    elif x <= indent <= y:
+        pix -= integral_img[y - indent][x + indent]
+        sqrt = (x + indent + 1) * (y + indent - (y - indent) + 1)
 
-    elif x < s and y < s:
-        p = l[y][x]
+    elif x < indent and y < indent:
+        pix = integral_img[y][x]
         sqrt = (x + 1) * (y + 1)
-    return p // sqrt
+    return pix // sqrt
