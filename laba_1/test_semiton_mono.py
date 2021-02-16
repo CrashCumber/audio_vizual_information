@@ -1,4 +1,4 @@
-from laba_1.utils import *
+from laba_1.utils import semitone, mono, Image
 
 
 def semitone_test(img):
@@ -12,6 +12,7 @@ def mono_test(img):
     img_s.save("result_images/img_mono.png")
 
 
-img = Image.open('images/112020.jpg')
+img_name = input("Enter name of image:")
+img = Image.open(f'images/{img_name}.jpg')
 semitone_test(img)
 mono_test(img)

@@ -2,5 +2,5 @@
 __pycache__
 .DS_Store
 
-laba_1/result_images/**
-laba_1/images/**
+laba_1/result_images/*
+laba_1/images/*

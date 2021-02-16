@@ -62,8 +62,9 @@ def semitone(img):
     for x in range(width):
         for y in range(height):
             pix = img.getpixel((x, y))
-            sum_ = sum(pix) // 3
-            new_image.putpixel((x, y), sum_)
+            sum_ = 0.3 * pix[0] + 0.59 * pix[1] + 0.11 * pix[2]
+            # sum_ = sum(pix) // 3
+            new_image.putpixel((x, y), int(sum_))
     return new_image
 
 

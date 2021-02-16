@@ -27,7 +27,8 @@ def resampling_two_step_test(img):
     img_samp.save("result_images/img_samp_two")
 
 
-img = Image.open('images/112020.jpg')
+img_name = input("Enter name of image:")
+img = Image.open(f'images/{img_name}.jpg')
 
 upsampling_test(img)
 downsampling_test(img)
