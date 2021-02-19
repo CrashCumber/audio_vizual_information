@@ -1,18 +1,14 @@
 from laba_1.utils import semitone, mono, Image
 
 
-def semitone_test(img):
-    img_s = semitone(img)
-    img_s.save("result_images/img_s.png")
-
-
-def mono_test(img):
+def mono_test(img, res):
     """Улучшенный алгоритм адаптивной бинаризации Бернсена."""
     img_s = mono(img)
-    img_s.save("result_images/img_mono.png")
+    img_s.save(f"result_images/binary_images/{res}.png")
 
 
 img_name = input("Enter name of image:")
+img_name_res = input("Enter result of image:")
+
 img = Image.open(f'images/{img_name}.jpg')
-semitone_test(img)
-mono_test(img)
+mono_test(img, img_name_res)
