@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageChops
 
 from laba_1.utils import integral, mono
 
@@ -44,6 +44,7 @@ def dilate(img):
 
 
 def close(img, img_res_name):
+    """Закрытие - фильтрация"""
     if str(img.mode) != '1':
         img = mono(img)
         img.save(f"result_images/{img_res_name}_s.png")
@@ -90,3 +91,10 @@ def sum_pix_area(integral_img, x, y, width, height, indent=1):
     elif x < indent and y < indent:
         sum_ = integral_img[y][x]
     return sum_
+
+
+def difference_images(img1, img2):
+    """Разница изображений."""
+    result = ImageChops.difference(img1, img2)
+    inv_img = ImageChops.invert(result)
+    return inv_img

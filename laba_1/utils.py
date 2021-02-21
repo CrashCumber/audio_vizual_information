@@ -54,7 +54,7 @@ def resampling(img, k):
 
 def semitone(img):
     """Reducing the image to a semitone"""
-    if str(img.mode) != 'L':
+    if str(img.mode) == 'L':
         return img
 
     width = img.size[0]
@@ -72,7 +72,7 @@ def semitone(img):
 
 def mono(img):
     """Converting the image to black and white."""
-    if str(img.mode) != '1':
+    if str(img.mode) == '1':
         return img
 
     img = semitone(img)
