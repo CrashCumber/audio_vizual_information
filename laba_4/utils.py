@@ -1,100 +1,130 @@
 import csv
 
+import numpy
 from PIL import Image, ImageDraw, ImageFont
 
+import matplotlib.pyplot as plt
+
+
+s = 'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ'
+
+fieldnames = [
+            "weight_black",
+            "normal_black",
+            "x_center",
+            "y_center",
+            "x_norm_center",
+            "y_norm_center",
+            "x_moment",
+            "x_norm_moment",
+            "y_moment",
+            "y_norm_moment",
+        ]
 
 white = 255
 black = 0
-allCharact=[]
 
 
-def count1(fname):
-    img = Image.open(fname)
+def get_profiles(file):
+    img = Image.open(file)
+    pix = img.load()
+    width = img.size[0]
+    height = img.size[1]
+    x_profiles = []
+    y_profiles = []
+
+    for i in range(width):
+        bright = 0
+        for j in range(height):
+            if (pix[i, j] == black):
+                bright += 1
+        x_profiles.append(bright)
+
+    for i in range(height):
+        bright = 0
+        for j in range(width):
+            if (pix[j, i] == black):
+                bright += 1
+        y_profiles.append(bright)
+
+    return x_profiles, y_profiles
+
+
+def get_hist_profile(s):
+
+    for c in s:
+        x_profile, y_profile = get_profiles("reference/" + c + '.bmp')
+        fig, axs = plt.subplots(1, 2, figsize=(9, 3))
+        axs[0].hist(x_profile)
+        axs[1].hist(y_profile, orientation="horizontal")
+        plt.savefig(f'hists/{c}.png')
+        del fig
+        del axs
+
+
+def attribute(file):
+    img = Image.open(file)
     pix = img.load()
     width = img.size[0]
     height = img.size[1]
 
-    size, size1, countblack, normalblack, xcen, xcenter, xrel, ycen, ycenter, yrel = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-
+    size, size1, weight_black, normal_black, x_center, y_center = 0, 0, 0, 0, 0, 0
 
     for i in range(width):
         for j in range(height):
             if (pix[i, j] == black):
-                countblack += 1
-                xcen +=i
-                ycen +=j
-
+                weight_black += 1
+                x_center += i
+                y_center += j
 
     size = width * height
-    normalblack = countblack / size
-    xcenter = xcen / countblack
-    xrel = (xcenter - 1) / (width - 1)
-    ycenter = ycen / countblack
-    yrel = (ycenter - 1) / (height - 1)
+    normal_black = weight_black / size
+    x_center = x_center / weight_black
+    x_norm_center = (x_center - 1) / (width - 1)
+    y_center = y_center / weight_black
+    y_norm_center = (y_center - 1) / (height - 1)
 
-    print("вес="+str(size))
-    print("удельный вес=" + str(countblack))
-    print("нормальный вес="+str(normalblack))
-    print("x центр="+ str(xcenter))
-    print("x норм =" + str(xrel))
-    print("y центр="+ str(ycenter))
-    print("y норм="+ str(yrel))
-
-    return countblack,normalblack,xcenter,ycenter,xrel,yrel
+    return [weight_black, normal_black, x_center, y_center, x_norm_center, y_norm_center]
 
 
-def count2(fname):
-    img = Image.open(fname)
+def attribute_moment(file):
+    img = Image.open(file)
     pix = img.load()
     width = img.size[0]
     height = img.size[1]
 
-    counblack,normalblack,xcenter,ycenter,xrel,yrel=count1(fname)
-    size1=0
-    Ixcenter, Ixrel, Iycenter, Iyrel, I45center, I45rel, I135center, I135rel = 0, 0, 0, 0, 0, 0, 0, 0
-
+    weight_black, normal_black, x_center, y_center, x_norm_center, y_norm_center = attribute(file)
+    x_moment, x_norm_moment, y_moment, y_norm_moment = 0, 0, 0, 0
 
     for i in range(width):
         for j in range(height):
             if (pix[i, j] == black):
-                Ixcenter = ((j - ycenter) ** 2)
-                Iycenter = ((i - ycenter) ** 2)
-                I45center = ((j - ycenter - i + xcenter) ** 2) /2
-                I135center = ((j - ycenter + i - xcenter) ** 2) /2
+                x_moment = ((j - y_center) ** 2)
+                y_moment = ((i - y_center) ** 2)
+                # I45center = ((j - y_center - i + x_center) ** 2) / 2
+                # I135center = ((j - y_center + i - x_center) ** 2) / 2
 
     size1 = width * width + height * height
-    Ixrel = Ixcenter / size1
-    Iyrel = Iycenter / size1
-    I45rel = I45center / size1
-    I135rel = I135center / size1
+    x_norm_moment = x_moment / size1
+    y_norm_moment = y_moment / size1
 
-    print("x момент="+ str(Ixcenter))
-    print("x момент норм="+ str(Ixrel))
-    print("у момент="+ str(Iycenter))
-    print("у момент норм="+ str(Iyrel))
-    print("45 момент="+ str(I45center))
-    print("45 момент норм ="+ str(I45rel))
-    print("135 момент="+ str(I135center))
-    print("135 момент норм="+ str(I135rel))
-    print("-------------------------------")
+    return [x_moment, x_norm_moment, y_moment, y_norm_moment]
 
-    return Ixcenter,Ixrel,Iycenter,Iyrel,I45center,I45rel,I135rel,I135center
 
-def mat(fname):
-    counblack, normalblack, xcenter, ycenter, xrel, yrel = count1(fname)
-    Ixcenter, Ixrel, Iycenter, Iyrel, I45center, I45rel, I135rel, I135center=count2(fname)
+def get_info(file):
+    res = [str(file).split('/')[1][0]]
 
-    lett= (str(fname)[0:1])+' ' + str(counblack) +' '+ str(normalblack)+' '+ str(xcenter)+' '+ str(xrel)+' '+ str(ycenter)+' '+ str(yrel)+' '+ \
-            str(Ixcenter)+','+ str(Ixrel)+' '+ str(Iycenter)+' '+ str(Iyrel)+' '+ str(I45center)+' '+ str(I45rel)+' '+ str(I135center)+' '+ str(I135rel)
-    print(lett)
+    return res + attribute(file) + attribute_moment(file)
 
-    allCharact.append([(str(fname)[0:1]),normalblack, xcenter, xrel, ycenter, yrel, Ixcenter, Ixrel, Iycenter, Iyrel, I45center, I45rel, I135center,I135rel])
 
-    with open('charact.csv', 'w', newline='') as csv_file:
-        fieldnames = ['normalblack', 'xcenter', 'xrel', 'ycenter', 'yrel', 'Ixcenter', 'Ixrel', 'Iycenter', 'Iyrel', 'I45center', 'I45rel', 'I135center','I135rel']
-        csv_writer = csv.writer(csv_file, fieldnames, delimiter=';')
-        for item in allCharact:
-            csv_writer.writerow(item)
+def generate_csv(string):
+    rows = [fieldnames]
+    for c in string:
+        rows.append(get_info("reference/" + str(c) + '.bmp'))
+
+    with open('info.csv', 'w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=';')
+        csv_writer.writerows(rows)
 
 
 def return_opt_size(font, alphabet):
@@ -106,26 +136,8 @@ def return_opt_size(font, alphabet):
         wmax, hmax = max(wmax, sz[0]), max(hmax, sz[1])
     return wmax, hmax
 
-def gen_letters_images(alphabet, save_to_file):
-    font = ImageFont.truetype(font="arm.ttf", size=40)
-    sz = return_opt_size(font, alphabet)
-    lst = []
-    i = 0
-    for c in alphabet:
-        img = Image.new("1", sz, "white")
-        draw = ImageDraw.Draw(img)
-        cursz = draw.textsize(str(c), font)
-        pos = ((sz[0] - cursz[0]) // 2, (sz[1] - cursz[1]) // 2)
-        draw.text((pos[0], 0), str(c), font=font)
-        img = clip_image(img)
-        if save_to_file:
-            img.save("res/" + str(c) + ".bmp")
-        i += 1
-        lst.append(img)
-    return lst
 
-
-def clip_image(img):
+def reference_image(img):
     pix = img.load()
     width, height = img.size[0], img.size[1]
     hor_p = [0 for x in range(width)]
@@ -159,49 +171,24 @@ def clip_image(img):
         else:
             break
 
-    #new_sz = (x0, 0, x1, height)
     new_sz = (x0, y0, x1, y1)
     return img.crop(new_sz)
 
 
-gen_letters_images('աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ', True)
+def gen_letters_reference_images(letters, save_to_file):
+    """Получение эталоного изображения"""
 
-for c in 'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ':
-
-        count1("res/"+str(c)+'.bmp')
-        count2("res/"+str(c)+'.bmp')
-        mat("res/"+str(c)+'.bmp')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import string
-#
-# from PIL import Image, ImageDraw, ImageFont
-#
-# for c in string.ascii_lowercase:
-#     fontPath = "font.ttf"
-#     sans16 = ImageFont.truetype(fontPath, 40)
-#
-#     im = Image.new("1", (50, 50), "white")
-#     draw = ImageDraw.Draw(im)
-#     draw.text((10, 0), str(c), font=sans16, fill="black")
-#
-#     im.save(str(c) + ".jpg")
-
+    font = ImageFont.truetype(font="arm.ttf", size=40)
+    sz = return_opt_size(font, letters)
+    for letter in letters:
+        img = Image.new("1", sz, "white")
+        draw = ImageDraw.Draw(img)
+        cursz = draw.textsize(str(letter), font)
+        pos = ((sz[0] - cursz[0]) // 2, (sz[1] - cursz[1]) // 2)
+        draw.text((pos[0], 0), str(letter), font=font)
+        img = reference_image(img)
+        if save_to_file:
+            img.save("reference/" + str(letter) + ".bmp")
 
 
 
