@@ -1,7 +1,8 @@
 import csv
 
 import numpy
-from PIL import Image, ImageDraw, ImageFont
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 import matplotlib.pyplot as plt
 
@@ -9,16 +10,17 @@ import matplotlib.pyplot as plt
 s = 'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ'
 
 fieldnames = [
-            "weight_black",
-            "normal_black",
-            "x_center",
-            "y_center",
-            "x_norm_center",
-            "y_norm_center",
-            "x_moment",
-            "x_norm_moment",
-            "y_moment",
-            "y_norm_moment",
+            "буква"
+            "вес черного",
+            "Удельный вес",
+            "Координаты центра тяжести x",
+            "Координаты центра тяжести y",
+            "Нормированные координаты центра тяжести x",
+            "Нормированные координаты центра тяжести y",
+            "Осевые моменты инерции по x",
+            "Нормированные осевые моменты инерции по x",
+            "Осевые моменты инерции по  y",
+            "Нормированные осевые моменты инерции по y",
         ]
 
 white = 255
@@ -55,9 +57,13 @@ def get_hist_profile(s):
     for c in s:
         x_profile, y_profile = get_profiles("reference/" + c + '.bmp')
         fig, axs = plt.subplots(1, 2, figsize=(9, 3))
+
+        # axs[0].bar(np.arange(0, len(x_profile)), height=x_profile)
+        # axs[1].barh(np.arange(0, len(y_profile)), width=y_profile)
         axs[0].hist(x_profile)
         axs[1].hist(y_profile, orientation="horizontal")
-        plt.savefig(f'hists/{c}.png')
+
+        plt.savefig(f'hists/{c}.png', dpi=70)
         del fig
         del axs
 
@@ -175,7 +181,7 @@ def reference_image(img):
     return img.crop(new_sz)
 
 
-def gen_letters_reference_images(letters, save_to_file):
+def gen_letters_reference_images(letters, save_to_file, convert=0):
     """Получение эталоного изображения"""
 
     font = ImageFont.truetype(font="arm.ttf", size=40)
@@ -188,7 +194,12 @@ def gen_letters_reference_images(letters, save_to_file):
         draw.text((pos[0], 0), str(letter), font=font)
         img = reference_image(img)
         if save_to_file:
-            img.save("reference/" + str(letter) + ".bmp")
+            if convert:
+                img = ImageChops.invert(img)
+                img.save("inverts_letters/" + str(letter) + ".bmp")
+            else:
+                img.save("reference/" + str(letter) + ".bmp")
+
 
 
 
