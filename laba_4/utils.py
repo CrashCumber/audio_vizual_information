@@ -29,23 +29,26 @@ black = 0
 
 def get_profiles(file):
     img = Image.open(file)
-    pix = img.load()
+    # pix = img.load()
     width = img.size[0]
     height = img.size[1]
     x_profiles = []
     y_profiles = []
 
-    for i in range(width):
+    for x in range(width):
         bright = 0
-        for j in range(height):
-            if (pix[i, j] == black):
+        for y in range(height):
+            pix = img.getpixel((x, y))
+            print(pix)
+            if pix == black:
                 bright += 1
         x_profiles.append(bright)
 
-    for i in range(height):
+    for y in range(height):
         bright = 0
-        for j in range(width):
-            if (pix[j, i] == black):
+        for x in range(width):
+            pix = img.getpixel((x, y))
+            if pix == black:
                 bright += 1
         y_profiles.append(bright)
 
@@ -58,10 +61,12 @@ def get_hist_profile(s):
         x_profile, y_profile = get_profiles("reference/" + c + '.bmp')
         fig, axs = plt.subplots(1, 2, figsize=(9, 3))
 
-        # axs[0].bar(np.arange(0, len(x_profile)), height=x_profile)
-        # axs[1].barh(np.arange(0, len(y_profile)), width=y_profile)
-        axs[0].hist(x_profile)
-        axs[1].hist(y_profile, orientation="horizontal")
+        axs[0].bar(np.arange(0, len(x_profile)), height=x_profile)
+        axs[1].barh(np.arange(0, len(y_profile)), width=y_profile)
+        print(x_profile)
+        print(y_profile)
+        # axs[0].hist(x_profile)
+        # axs[1].hist(y_profile, orientation="horizontal")
 
         plt.savefig(f'hists/{c}.png', dpi=70)
         del fig
@@ -78,7 +83,7 @@ def attribute(file):
 
     for i in range(width):
         for j in range(height):
-            if (pix[i, j] == black):
+            if pix[i, j] == black:
                 weight_black += 1
                 x_center += i
                 y_center += j
@@ -104,11 +109,9 @@ def attribute_moment(file):
 
     for i in range(width):
         for j in range(height):
-            if (pix[i, j] == black):
+            if pix[i, j] == black:
                 x_moment = ((j - y_center) ** 2)
                 y_moment = ((i - y_center) ** 2)
-                # I45center = ((j - y_center - i + x_center) ** 2) / 2
-                # I135center = ((j - y_center + i - x_center) ** 2) / 2
 
     size1 = width * width + height * height
     x_norm_moment = x_moment / size1
