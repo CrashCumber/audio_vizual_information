@@ -44,7 +44,7 @@ def resampling(img, k):
     new_w = int(width * k - 1)
     new_h = int(height * k - 1)
 
-    new_image = Image.new('RGB', (new_w, new_h))
+    new_image = Image.new('1', (new_w, new_h))
     for x in range(new_w):
         for y in range(new_h):
             pix = img.getpixel((x / k, y / k))

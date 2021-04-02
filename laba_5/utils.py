@@ -63,7 +63,6 @@ def convert_to_bin(img):
 
 
 def segmentation(img):
-    # img = convert_to_bin(img)
     height = img.size[1]
     x_profiles, y_profiles = get_profiles(img)
     ep = 0

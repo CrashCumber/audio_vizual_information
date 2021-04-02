@@ -194,7 +194,7 @@ def gen_letters_reference_images(letters, save_to_file, convert=0):
         draw = ImageDraw.Draw(img)
         cursz = draw.textsize(str(letter), font)
         pos = ((sz[0] - cursz[0]) // 2, (sz[1] - cursz[1]) // 2)
-        draw.text((pos[0], 0), str(letter), font=font)
+        draw.text_len((pos[0], 0), str(letter), font=font)
         img = reference_image(img)
         if save_to_file:
             if convert:
