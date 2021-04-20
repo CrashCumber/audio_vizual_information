@@ -32,13 +32,7 @@ def cut(fname):
         new_img.save("letters/" + str(i) + ".bmp")
     for i in range(len(num)):
         img = crop("letters/" + str(i) + ".bmp")
-        # img = ImageChops.invert(img)
         img.save("letters/" + str(i) + ".bmp")
-    # for i in range(len(num)):
-    #     img_ = Image.open("letters/" + str(i) + ".bmp")
-    #     width, height = img.size
-    #     img_ = img_.resize((int(k*width), int(k*height)))
-    #     img_.save("letters/" + str(i) + ".bmp")
     return len(num)
 
 
@@ -82,7 +76,7 @@ def crop(fname):
 
 def get_profiles(img):
 
-    img = convert_to_bin(img)
+    # img = convert_to_bin(img)
     width = img.size[0]
     height = img.size[1]
     x_profiles = []
@@ -106,9 +100,9 @@ def get_profiles(img):
 
     return x_profiles, y_profiles
 
-
-def convert_to_bin(img):
-    if str(img.mode) != '1':
-        img = mono(img)
-    img.save("string.bmp")
-    return img
+#
+# def convert_to_bin(img):
+#     if str(img.mode) != '1':
+#         img = mono(img)
+#     img.save("string.png")
+#     return img
