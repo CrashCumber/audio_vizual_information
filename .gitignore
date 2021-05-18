@@ -2,3 +2,8 @@
 __pycache__
 .DS_Store
 venv
+laba_3/gen_matrix.py
+laba_3/matrixs_new.csv
+laba_3/matrixs_new_x.csv
+laba_3/matrixs_newXY.csv
+laba_3/matrixs_new_y.csv
