@@ -8,6 +8,7 @@
 
 ![](images/text.jpg)
 ![](hists/text.png)
+![](results/text_semiton.png)
 
 ### Изменяем y
 - c = 1 , f = 0 , y = 0.1
@@ -95,6 +96,8 @@
 
 ![](images/corgi.jpg)
 ![](hists/corgi.png)
+![](results/corgi_semiton.png)
+
 
 ### Изменяем y
 - c = 1 , f = 0 , y = 0.1

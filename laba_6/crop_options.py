@@ -1,8 +1,7 @@
-from PIL import Image, ImageChops
+from PIL import Image
 
-from laba_1.utils import mono
 
-k = 1/1.6
+k = 1 / 1.6
 
 white = 255
 black = 0
@@ -27,7 +26,7 @@ def cut(fname):
 
     for i in range(len(num)):
         left, right = num[i]
-        new_img = img.crop((left, 0, right+2, height))
+        new_img = img.crop((left, 0, right + 2, height))
 
         new_img.save("letters/" + str(i) + ".bmp")
     for i in range(len(num)):
@@ -40,8 +39,8 @@ def crop(fname):
     img = Image.open(fname)
     pix = img.load()
     width, height = img.size[0], img.size[1]
-    hor_p = [0 for x in range(width)]
-    ver_p = [0 for x in range(height)]
+    hor_p = [0 for _ in range(width)]
+    ver_p = [0 for _ in range(height)]
     for i in range(width):
         for j in range(height):
             if pix[i, j] == 0:
@@ -75,7 +74,6 @@ def crop(fname):
 
 
 def get_profiles(img):
-
     # img = convert_to_bin(img)
     width = img.size[0]
     height = img.size[1]
@@ -100,9 +98,3 @@ def get_profiles(img):
 
     return x_profiles, y_profiles
 
-#
-# def convert_to_bin(img):
-#     if str(img.mode) != '1':
-#         img = mono(img)
-#     img.save("string.png")
-#     return img

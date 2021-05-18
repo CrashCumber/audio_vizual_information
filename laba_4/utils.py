@@ -1,27 +1,23 @@
 import csv
-
-import numpy
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageChops
-
 import matplotlib.pyplot as plt
 
 
-s = 'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ'
+s = "աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ"
 
 fieldnames = [
-            "буква"
-            "вес черного",
-            "Удельный вес",
-            "Координаты центра тяжести x",
-            "Координаты центра тяжести y",
-            "Нормированные координаты центра тяжести x",
-            "Нормированные координаты центра тяжести y",
-            "Осевые моменты инерции по x",
-            "Нормированные осевые моменты инерции по x",
-            "Осевые моменты инерции по  y",
-            "Нормированные осевые моменты инерции по y",
-        ]
+    "буква" "вес черного",
+    "Удельный вес",
+    "Координаты центра тяжести x",
+    "Координаты центра тяжести y",
+    "Нормированные координаты центра тяжести x",
+    "Нормированные координаты центра тяжести y",
+    "Осевые моменты инерции по x",
+    "Нормированные осевые моменты инерции по x",
+    "Осевые моменты инерции по  y",
+    "Нормированные осевые моменты инерции по y",
+]
 
 white = 255
 black = 0
@@ -29,7 +25,6 @@ black = 0
 
 def get_profiles(file):
     img = Image.open(file)
-    # pix = img.load()
     width = img.size[0]
     height = img.size[1]
     x_profiles = []
@@ -58,17 +53,13 @@ def get_profiles(file):
 def get_hist_profile(s):
 
     for c in s:
-        x_profile, y_profile = get_profiles("reference/" + c + '.bmp')
+        x_profile, y_profile = get_profiles("reference/" + c + ".bmp")
         fig, axs = plt.subplots(1, 2, figsize=(9, 3))
 
         axs[0].bar(np.arange(0, len(x_profile)), height=x_profile)
         axs[1].barh(np.arange(0, len(y_profile)), width=y_profile)
-        print(x_profile)
-        print(y_profile)
-        # axs[0].hist(x_profile)
-        # axs[1].hist(y_profile, orientation="horizontal")
 
-        plt.savefig(f'hists/{c}.png', dpi=70)
+        plt.savefig(f"hists/{c}.png", dpi=70)
         del fig
         del axs
 
@@ -95,7 +86,14 @@ def attribute(file):
     y_center = y_center / weight_black
     y_norm_center = (y_center - 1) / (height - 1)
 
-    return [weight_black, normal_black, x_center, y_center, x_norm_center, y_norm_center]
+    return [
+        weight_black,
+        normal_black,
+        x_center,
+        y_center,
+        x_norm_center,
+        y_norm_center,
+    ]
 
 
 def attribute_moment(file):
@@ -104,14 +102,21 @@ def attribute_moment(file):
     width = img.size[0]
     height = img.size[1]
 
-    weight_black, normal_black, x_center, y_center, x_norm_center, y_norm_center = attribute(file)
+    (
+        weight_black,
+        normal_black,
+        x_center,
+        y_center,
+        x_norm_center,
+        y_norm_center,
+    ) = attribute(file)
     x_moment, x_norm_moment, y_moment, y_norm_moment = 0, 0, 0, 0
 
     for i in range(width):
         for j in range(height):
             if pix[i, j] == black:
-                x_moment = ((j - y_center) ** 2)
-                y_moment = ((i - y_center) ** 2)
+                x_moment = (j - y_center) ** 2
+                y_moment = (i - y_center) ** 2
 
     size1 = width * width + height * height
     x_norm_moment = x_moment / size1
@@ -121,7 +126,7 @@ def attribute_moment(file):
 
 
 def get_info(file):
-    res = [str(file).split('/')[1][0]]
+    res = [str(file).split("/")[1][0]]
 
     return res + attribute(file) + attribute_moment(file)
 
@@ -129,10 +134,10 @@ def get_info(file):
 def generate_csv(string):
     rows = [fieldnames]
     for c in string:
-        rows.append(get_info("reference/" + str(c) + '.bmp'))
+        rows.append(get_info("reference/" + str(c) + ".bmp"))
 
-    with open('info.csv', 'w', newline='') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=';')
+    with open("info.csv", "w", newline="") as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=";")
         csv_writer.writerows(rows)
 
 
@@ -202,11 +207,3 @@ def gen_letters_reference_images(letters, save_to_file, convert=0):
                 img.save("inverts_letters/" + str(letter) + ".bmp")
             else:
                 img.save("reference/" + str(letter) + ".bmp")
-
-
-
-
-
-
-
-

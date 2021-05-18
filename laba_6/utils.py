@@ -7,24 +7,25 @@ from laba_1.utils import mono
 from laba_6.crop_options import cut
 
 
-s = 'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ'
-k = 1/1.6
+s = "աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ"
+k = 1 / 1.6
 
 white = 255
 black = 0
 
 
 def convert_to_bin(img):
-    if str(img.mode) != '1':
+    if str(img.mode) != "1":
         img = mono(img)
     img.save("string.png")
     return img
 
+
 def get_dif(real, ideal):
     res = 0
     for i in range(len(real)):
-        res += (real[i] - ideal[i])**2
-    return 1 - res**0.5
+        res += (real[i] - ideal[i]) ** 2
+    return 1 - res ** 0.5
 
 
 def attribute(file):
@@ -49,13 +50,20 @@ def attribute(file):
     y_center = y_center / weight_black
     y_norm_center = (y_center - 1) / (height - 1)
 
-    x_moment, x_norm_moment, y_moment, y_norm_moment, I45_center, I135_center = 0, 0, 0, 0, 0, 0
+    x_moment, x_norm_moment, y_moment, y_norm_moment, I45_center, I135_center = (
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    )
 
     for i in range(width):
         for j in range(height):
             if img.getpixel((i, j)) == black:
-                x_moment += ((j - y_center) ** 2)
-                y_moment += ((i - x_center) ** 2)
+                x_moment += (j - y_center) ** 2
+                y_moment += (i - x_center) ** 2
                 I45_center += ((j - y_center - i + x_center) ** 2) / 2
                 I135_center += ((j - y_center + i - x_center) ** 2) / 2
 
@@ -64,7 +72,15 @@ def attribute(file):
     I45_rel = I45_center / (weight_black ** 2)
     I135_rel = I135_center / (weight_black ** 2)
 
-    return [normal_black, x_norm_center, y_norm_center, x_norm_moment, y_norm_moment, I135_rel, I45_rel]
+    return [
+        normal_black,
+        x_norm_center,
+        y_norm_center,
+        x_norm_moment,
+        y_norm_moment,
+        I135_rel,
+        I45_rel,
+    ]
 
 
 reference_letter_close_values = {}
@@ -73,7 +89,7 @@ real_letter_close_values = {}
 img = Image.open("image.png")
 img = convert_to_bin(img)
 
-text_len = cut('string.png')
+text_len = cut("string.png")
 
 for i in s:
     close = attribute("reference/" + i + ".bmp")
@@ -113,18 +129,17 @@ root_h, dirs_h, files_h = list(os.walk("letters"))[0]
 files_h.sort()
 
 
-
-with open('README.md', 'a') as file:
+with open("README.md", "a") as file:
 
     for i in range(len(files_h)):
-        title = f'{i}. \n\n'
+        title = f"{i}. \n\n"
         # h = f'![](letters/{i}.png)\n\n'
         # j = f'![](results/{i}.bmp)\n\n'
         # img = Image.open(f"results/{i}.bmp")
         # img = ImageChops.invert(img)
         # img.save("invert_letters/" + str(i) + ".bmp")
         # i_ = f'![](invert_letters/{i}.bmp)\n\n'
-        j = f'![](letters/{i}.bmp)\n\n'
+        j = f"![](letters/{i}.bmp)\n\n"
         fields = (
             f"\n#### Фактические значения\n\n"
             f"+ Удельный вес = {real_letter_close_values[0][0]}\n\n"
@@ -155,12 +170,12 @@ with open('README.md', 'a') as file:
         file.writelines([title, j, fields, fields_, dred])
 
     for i in s:
-        title = f'{i}  )  \n\n'
+        title = f"{i}  )  \n\n"
         # h = f'![](letters/{i}.png)\n\n'
         # j = f'![](results/{i}.bmp)\n\n'
         # img = Image.open(f"reference/{i}.bmp")
 
-        j = f'![](reference/{i}.bmp)\n\n'
+        j = f"![](reference/{i}.bmp)\n\n"
         fields = (
             f"\nУдельный вес = {reference_letter_close_values[i][0]}\n\n"
             f"+ Нормированные координаты центра тяжести x = {reference_letter_close_values[i][1]}\n\n"
@@ -170,6 +185,5 @@ with open('README.md', 'a') as file:
             f"+ Диагональный осевой момент инерции  = {reference_letter_close_values[i][5]}\n\n"
             f"+ Диагональный осевой момент инерции  = {reference_letter_close_values[i][6]}\n\n"
         )
-
 
         file.writelines([title, j, fields])

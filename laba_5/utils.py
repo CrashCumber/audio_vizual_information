@@ -1,14 +1,10 @@
-import csv
-
-import numpy
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont, ImageChops
-
+from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
-
 from laba_1.utils import mono
 
-s = 'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ'
+
+s = "աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցուփքեւօֆ"
 
 white = 255
 black = 0
@@ -47,16 +43,12 @@ def print_bar(img):
 
     axs[0].bar(np.arange(0, len(x_profiles)), height=x_profiles)
     axs[1].barh(np.arange(0, len(y_profiles)), width=y_profiles)
-    print(y_profiles)
-    print(x_profiles)
-    # axs[0].hist(x_profile)
-    # axs[1].hist(y_profile, orientation="horizontal")
 
-    plt.savefig(f'profile.png', dpi=70)
+    plt.savefig(f"profile.png", dpi=70)
 
 
 def convert_to_bin(img):
-    if str(img.mode) != '1':
+    if str(img.mode) != "1":
         img = mono(img)
     img.save("string.bmp")
     return img
@@ -82,14 +74,14 @@ def segmentation(img):
         left, right = res[i]
         new_im = img.crop((left, 0, right + 2, height))
         new_im = reference_image(new_im)
-        new_im.save("results/" + str(i) + '.bmp', mode='1')
+        new_im.save("results/" + str(i) + ".bmp", mode="1")
     return res
 
 
 def get_hist_profile(res):
 
     for i in range(len(res)):
-        img = Image.open("results/" + str(i) + '.bmp')
+        img = Image.open("results/" + str(i) + ".bmp")
         img = reference_image(img)
 
         x_profile, y_profile = get_profiles(img)
@@ -98,9 +90,10 @@ def get_hist_profile(res):
         axs[0].bar(np.arange(0, len(x_profile)), height=x_profile)
         axs[1].barh(np.arange(0, len(y_profile)), width=y_profile)
 
-        plt.savefig(f'hists/{i}.png', dpi=70)
+        plt.savefig(f"hists/{i}.png", dpi=70)
         del fig
         del axs
+
 
 def return_opt_size(font, alphabet):
     img = Image.new("1", (50, 50), "white")
@@ -115,8 +108,8 @@ def return_opt_size(font, alphabet):
 def reference_image(img):
     pix = img.load()
     width, height = img.size[0], img.size[1]
-    hor_p = [0 for x in range(width)]
-    ver_p = [0 for x in range(height)]
+    hor_p = [0 for _ in range(width)]
+    ver_p = [0 for _ in range(height)]
     for i in range(width):
         for j in range(height):
             if pix[i, j] == 0:
@@ -150,14 +143,5 @@ def reference_image(img):
     return img.crop(new_sz)
 
 
-img = Image.open('string.bmp')
-
-
+img = Image.open("string.bmp")
 print(segmentation(img))
-
-
-
-
-
-
-

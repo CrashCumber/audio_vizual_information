@@ -14,19 +14,17 @@ files_h.sort()
 # files_i.sort()
 
 
-with open('README.md', 'a') as file:
+with open("README.md", "a") as file:
     img = Image.open(f"string.bmp")
     img = ImageChops.invert(img)
     img.save("invert_string.bmp")
 
     for i in range(len(files)):
-        title = f'{i+1}. \n\n'
-        h = f'![](hists/{i}.png)\n\n'
-        j = f'![](results/{i}.bmp)\n\n'
+        title = f"{i+1}. \n\n"
+        h = f"![](hists/{i}.png)\n\n"
+        j = f"![](results/{i}.bmp)\n\n"
         img = Image.open(f"results/{i}.bmp")
         img = ImageChops.invert(img)
         img.save("invert_letters/" + str(i) + ".bmp")
-        i_ = f'![](invert_letters/{i}.bmp)\n\n'
+        i_ = f"![](invert_letters/{i}.bmp)\n\n"
         file.writelines([title, j, i_, h])
-
-
