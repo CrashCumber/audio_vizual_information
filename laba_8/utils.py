@@ -41,10 +41,12 @@ def normalize(matrix):
 
 
 def contrast(matrix, c, f, y):
-    norm_matrix, max_rgb = normalize(matrix)
+    norm_matrix, max_image = normalize(matrix)
 
-    norm_new_matrix = c * (norm_matrix + f) ** y
-    new_matrix = (norm_new_matrix * max_rgb).astype("uint8")
+    norm_new_matrix = c * (norm_matrix + f / max_image) ** y
+    norm_new_matrix[norm_new_matrix > 1] = 1
+    new_matrix = (norm_new_matrix * max_image).astype("uint8")
+
     Image.fromarray(new_matrix, mode="L").save(
         f"results/{name+str(c)+str(f)+str(y)}.png"
     )

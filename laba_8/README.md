@@ -64,10 +64,6 @@
 
 
 ## Изменяем f
-- c = 1 , f = -10 , y = 1
-
-![](results/text1.0-10.01.0.png)
-![](hists/text1-101.png)
 
 - c = 1 , f = 10 , y = 1
 
@@ -83,11 +79,6 @@
 
 ![](results/text1.050.01.0.png)
 ![](hists/text1501.png)
-
-- c = 1 , f = 256 , y = 1
-
-![](results/text1.0256.01.0.png)
-![](hists/text12561.png)
 
 
 
@@ -153,10 +144,7 @@
 
 
 ## Изменяем f
-- c = 1 , f = -10 , y = 1
 
-![](results/corgi1.0-10.01.0.png)
-![](hists/corgi1-101.png)
 
 - c = 1 , f = 10 , y = 1
 
@@ -173,7 +161,4 @@
 ![](results/corgi1.050.01.0.png)
 ![](hists/corgi1501.png)
 
-- c = 1 , f = 256 , y = 1
 
-![](results/corgi1.0256.01.0.png)
-![](hists/corgi12561.png)
